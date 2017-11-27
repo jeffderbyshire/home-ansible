@@ -1,0 +1,7 @@
+---
+- name: upgrade hosts
+  hosts: all
+  tasks:
+    - name: ensure servers are updated and upgraded
+      apt: upgrade=safe update_cache=yes
+...
