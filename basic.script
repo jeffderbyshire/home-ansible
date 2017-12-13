@@ -1,0 +1,26 @@
+#!/bin/bash
+HOST="ellenplex.me.local"
+SCRIPT="run_basic.sh"
+cat << EOM >$SCRIPT
+echo "net.ipv6.conf.all.disable_ipv6 = 1" >> /etc/sysctl.conf
+echo "net.ipv6.conf.default.disable_ipv6 = 1" >> /etc/sysctl.conf
+echo "net.ipv6.conf.lo.disable_ipv6 = 1" >> /etc/sysctl.conf
+sysctl -p /etc/sysctl.conf
+apt -y update
+apt -y upgrade
+apt -y install sudo python lsof vim vim-gtk zsh python-apt aptitude git curl xterm
+chsh -s /bin/zsh
+curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+sh -c "\$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh);exit"
+EOM
+chmod 755 $SCRIPT
+scp $SCRIPT root@$HOST:
+ssh -t root@$HOST "./run_basic.sh; exit"
+ssh root@$HOST "sed -i 's|^ZSH_THEME=.*|ZSH_THEME=\"bureau\"|g' \
+				/root/.zshrc"
+ssh root@$HOST "rm run_basic.sh"
+scp vimrc.init root@$HOST:.vimrc
+ssh root@$HOST "vim -c 'PlugInstall' -c 'q' -c 'q'"
+scp vimrc.full root@$HOST:.vimrc
+rm -f $SCRIPT
+exit 0
