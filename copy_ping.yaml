@@ -1,0 +1,17 @@
+---
+- name: copy ping script to host and install crontab
+  hosts: "{{ target }}"
+  tasks:
+    - name: copy ping file
+      copy:
+        src: ping.script
+        dest: /root/ping.script
+        owner: root
+        group: root
+        mode: 0750
+    - name: install crontab
+      cron:
+        name: "ping local hosts"
+        minute: "*/5"
+        job: "/root/ping.script"
+...
